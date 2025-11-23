@@ -13,12 +13,18 @@ const Chat: NextPage = () => {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
+  const [messageCounter, setMessageCounter] = useState(0)
+
+  const generateMessageId = () => {
+    setMessageCounter(prev => prev + 1)
+    return `${Date.now()}-${messageCounter}`
+  }
 
   const sendMessage = async () => {
     if (!input.trim()) return
 
     const userMessage: Message = { 
-      id: Date.now().toString(),
+      id: generateMessageId(),
       role: 'user', 
       content: input 
     }
@@ -43,7 +49,7 @@ const Chat: NextPage = () => {
         setMessages([
           ...newMessages,
           { 
-            id: Date.now().toString(),
+            id: generateMessageId(),
             role: 'assistant', 
             content: `Error: ${data.error}` 
           },
@@ -52,7 +58,7 @@ const Chat: NextPage = () => {
         setMessages([
           ...newMessages,
           { 
-            id: Date.now().toString(),
+            id: generateMessageId(),
             role: 'assistant', 
             content: data.message 
           },
@@ -63,7 +69,7 @@ const Chat: NextPage = () => {
       setMessages([
         ...newMessages,
         { 
-          id: Date.now().toString(),
+          id: generateMessageId(),
           role: 'assistant', 
           content: 'Error: Failed to send message' 
         },

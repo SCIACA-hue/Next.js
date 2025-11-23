@@ -4,6 +4,7 @@ import { useState } from 'react'
 import styles from '../styles/Chat.module.css'
 
 type Message = {
+  id: string
   role: 'user' | 'assistant'
   content: string
 }
@@ -16,7 +17,11 @@ const Chat: NextPage = () => {
   const sendMessage = async () => {
     if (!input.trim()) return
 
-    const userMessage: Message = { role: 'user', content: input }
+    const userMessage: Message = { 
+      id: Date.now().toString(),
+      role: 'user', 
+      content: input 
+    }
     const newMessages = [...messages, userMessage]
     setMessages(newMessages)
     setInput('')
@@ -37,26 +42,38 @@ const Chat: NextPage = () => {
         console.error('Error:', data.error)
         setMessages([
           ...newMessages,
-          { role: 'assistant', content: `Error: ${data.error}` },
+          { 
+            id: Date.now().toString(),
+            role: 'assistant', 
+            content: `Error: ${data.error}` 
+          },
         ])
       } else {
         setMessages([
           ...newMessages,
-          { role: 'assistant', content: data.message },
+          { 
+            id: Date.now().toString(),
+            role: 'assistant', 
+            content: data.message 
+          },
         ])
       }
     } catch (error) {
       console.error('Failed to send message:', error)
       setMessages([
         ...newMessages,
-        { role: 'assistant', content: 'Error: Failed to send message' },
+        { 
+          id: Date.now().toString(),
+          role: 'assistant', 
+          content: 'Error: Failed to send message' 
+        },
       ])
     } finally {
       setLoading(false)
     }
   }
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       sendMessage()
@@ -81,9 +98,9 @@ const Chat: NextPage = () => {
                 <p>Start a conversation with ChatGPT</p>
               </div>
             )}
-            {messages.map((message, index) => (
+            {messages.map((message) => (
               <div
-                key={index}
+                key={message.id}
                 className={`${styles.message} ${
                   message.role === 'user' ? styles.userMessage : styles.assistantMessage
                 }`}
@@ -107,7 +124,7 @@ const Chat: NextPage = () => {
               className={styles.input}
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
+              onKeyDown={handleKeyDown}
               placeholder="Type your message here..."
               disabled={loading}
               rows={3}
